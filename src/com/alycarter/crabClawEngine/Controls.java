@@ -1,4 +1,4 @@
-package com.cow_crab_games.crab_claw_engine;
+package com.alycarter.crabClawEngine;
 
 import java.awt.Canvas;
 import java.awt.MouseInfo;

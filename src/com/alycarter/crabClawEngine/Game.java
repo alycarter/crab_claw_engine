@@ -1,4 +1,4 @@
-package com.cow_crab_games.crab_claw_engine;
+package com.alycarter.crabClawEngine;
 
 import java.awt.Canvas;
 import java.awt.Graphics;
@@ -30,6 +30,11 @@ public abstract class Game {
 	
 	private boolean running=false;
 	
+	private double deltaTime=0;
+	private int ups=0;
+	private int fps=0;
+	private int frameLimit = 120;
+	
 	public Game(String title, int windowedFrameWidth, int windowedFrameHeight) {
 		this.title=title;
 		this.windowedFrameWidth=windowedFrameWidth;
@@ -54,12 +59,35 @@ public abstract class Game {
 				frame.setVisible(true);
 				canvas.requestFocusInWindow();
 				running = true;
-//				long ns = 1000000000;
-//				long start=0;
-//				long end = 0;
+				long start;
+				long end;
+				long timeTaken;
+				long timeSinceRender=0;
+				long ns =  1000000000;
+				int framesThisSecond=0;
+				int updatesThisSecond = 0;
+				long second=0;
 				while(running){
+					start = System.nanoTime();
 					update();
-					render();
+					updatesThisSecond++;
+					if((double)timeSinceRender/(double)ns>1.0/(double)frameLimit){
+						render();
+						timeSinceRender=0;
+						framesThisSecond++;
+					}
+					end = System.nanoTime();
+					timeTaken = end - start;
+					timeSinceRender+=timeTaken;
+					deltaTime = (double)timeTaken/(double)ns;
+					second+=timeTaken;
+					if(second>ns){
+						fps=framesThisSecond;
+						ups=updatesThisSecond;
+						framesThisSecond=0;
+						updatesThisSecond=0;
+						second =0;
+					}
 				}
 				gd.setFullScreenWindow(null);
 				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new WindowEvent(frame,WindowEvent.WINDOW_CLOSING));
@@ -91,6 +119,7 @@ public abstract class Game {
 		canvas= new Canvas();
 		frame.getContentPane().add(canvas);
 		setWindowedFrameSize(windowedFrameWidth, windowedFrameHeight);
+		frame.setResizable(false);
 		image= new BufferedImage(renderResolutionWidth,renderResolutionHeight,BufferedImage.TYPE_INT_ARGB);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		controls = new Controls(canvas);
@@ -139,13 +168,45 @@ public abstract class Game {
 	}
 	
 	public void setWindowedMode(){
-		frame.setUndecorated(false);
+		frame.dispose();
+		frame = new JFrame(title);
+		frame.getContentPane().add(canvas);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
 		setWindowedFrameSize(windowedFrameWidth, windowedFrameHeight);
+		frame.setResizable(false);
 		gd.setFullScreenWindow(null);
 	}
 	
 	public Controls getControls(){
 		return controls;
+	}
+	
+	public double getDeltaTime(){
+		return deltaTime;
+	}
+	
+	public int getFramesLastSecond(){
+		return fps;
+	}
+	
+	public int getUpdatesLastSecond(){
+		return ups;
+	}
+	
+	public double getPredictedFps(){
+		return 1/deltaTime;
+	}
+	
+	public int getFrameLimit(){
+		return frameLimit;
+	}
+	
+	public void setFrameLimit(int limit){
+		if(limit<1){
+			limit=1;
+		}
+		frameLimit=limit;
 	}
 	
 	public abstract void onInitialize();
