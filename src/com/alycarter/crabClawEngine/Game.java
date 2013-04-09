@@ -69,24 +69,33 @@ public abstract class Game {
 				long second=0;
 				while(running){
 					start = System.nanoTime();
-					update();
-					updatesThisSecond++;
-					if((double)timeSinceRender/(double)ns>1.0/(double)frameLimit){
-						render();
-						timeSinceRender=0;
-						framesThisSecond++;
-					}
-					end = System.nanoTime();
-					timeTaken = end - start;
-					timeSinceRender+=timeTaken;
-					deltaTime = (double)timeTaken/(double)ns;
-					second+=timeTaken;
-					if(second>ns){
-						fps=framesThisSecond;
-						ups=updatesThisSecond;
-						framesThisSecond=0;
-						updatesThisSecond=0;
-						second =0;
+					if(frame.isFocused()){
+						canvas.requestFocusInWindow();
+						update();
+						updatesThisSecond++;
+						if((double)timeSinceRender/(double)ns>1.0/(double)frameLimit){
+							render();
+							timeSinceRender=0;
+							framesThisSecond++;
+						}
+						end = System.nanoTime();
+						timeTaken = end - start;
+						timeSinceRender+=timeTaken;
+						deltaTime = (double)timeTaken/(double)ns;
+						second+=timeTaken;
+						if(second>ns){
+							fps=framesThisSecond;
+							ups=updatesThisSecond;
+							framesThisSecond=0;
+							updatesThisSecond=0;
+							second =0;
+						}
+					}else{
+						controls.clearControls();
+						try {
+							Thread.sleep(2);
+						} catch (InterruptedException e) {e.printStackTrace();}
+						
 					}
 				}
 				gd.setFullScreenWindow(null);
@@ -193,11 +202,7 @@ public abstract class Game {
 	public int getUpdatesLastSecond(){
 		return ups;
 	}
-	
-	public double getPredictedFps(){
-		return 1/deltaTime;
-	}
-	
+
 	public int getFrameLimit(){
 		return frameLimit;
 	}
