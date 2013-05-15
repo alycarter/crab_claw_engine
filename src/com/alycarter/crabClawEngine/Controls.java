@@ -40,16 +40,17 @@ public class Controls implements KeyListener, MouseListener{
 		double ly=game.getLocationOnScreen().getY();
 		
 		mouseLocation = new Point((int)(MouseInfo.getPointerInfo().getLocation().getX()-lx),(int)( MouseInfo.getPointerInfo().getLocation().getY()-ly));
-		
-		this.keysPressed.clear();
-		for (int i = 0;i<tempKeysPressed.size();i++){
-			this.keysPressed.add(tempKeysPressed.get(i).intValue());
-		}
-		this.keysTyped.clear();
-		for (int i = 0;i<tempKeysTyped.size();i++){
-			this.keysTyped.add(tempKeysTyped.get(0).intValue());
-			this.tempKeysTyped.remove(0);
-		}
+		try{
+			this.keysPressed.clear();
+			for (int i = 0;i<tempKeysPressed.size();i++){
+				this.keysPressed.add(tempKeysPressed.get(i).intValue());
+			}
+			this.keysTyped.clear();
+			for (int i = 0;i<tempKeysTyped.size();i++){
+				this.keysTyped.add(tempKeysTyped.get(0).intValue());
+				this.tempKeysTyped.remove(0);
+			}
+		}catch(Exception e){}
 		leftClicked=leftClickedTemp;
 		leftClickedTemp=false;
 		leftDown=leftDownTemp;
