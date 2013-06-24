@@ -1,6 +1,7 @@
 package com.alycarter.crabClawEngine;
 
 import java.awt.Canvas;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -9,6 +10,8 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
+
+import com.alycarter.crabClawEngine.state.StateMachine;
 
 public abstract class Game {
 	
@@ -34,6 +37,8 @@ public abstract class Game {
 	private int ups=0;
 	private int fps=0;
 	private int frameLimit = 120;
+	
+	public StateMachine stateMachine = new StateMachine();
 	
 	public Game(String title, int windowedFrameWidth, int windowedFrameHeight) {
 		this.title=title;
@@ -108,6 +113,9 @@ public abstract class Game {
 		if(canvas.getBufferStrategy()==null){
 			canvas.createBufferStrategy(3);
 		}
+		if(stateMachine.getCurrentState()!= null){
+			stateMachine.getCurrentState().render(image.getGraphics());
+		}
 		onRender(image.getGraphics());
 		canvas.getBufferStrategy().getDrawGraphics().drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight(),null);
 		canvas.getBufferStrategy().show();
@@ -115,6 +123,9 @@ public abstract class Game {
 
 	private void update() {
 		controls.update();
+		if(stateMachine.getCurrentState()!= null){
+			stateMachine.getCurrentState().update();
+		}
 		onUpdate();
 	}
 
@@ -124,11 +135,11 @@ public abstract class Game {
 
 	private void initialize(){
 		gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-		frame= new JFrame(title); 
+		frame= new JFrame(title);
+		frame.setResizable(false);	
 		canvas= new Canvas();
 		frame.getContentPane().add(canvas);
 		setWindowedFrameSize(windowedFrameWidth, windowedFrameHeight);
-		frame.setResizable(false);
 		image= new BufferedImage(renderResolutionWidth,renderResolutionHeight,BufferedImage.TYPE_INT_ARGB);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		controls = new Controls(canvas);
@@ -140,10 +151,10 @@ public abstract class Game {
 	public void setWindowedFrameSize(int width, int height){
 		this.windowedFrameWidth=width;
 		this.windowedFrameHeight=height;
-		frame.setSize(width, height);
-		canvas.setSize(width, height);
+		frame.getContentPane().setSize(width, height);
+		canvas.setPreferredSize(new Dimension(width, height));
+		frame.pack();
 	}
-	
 	public void setRenderResolutionSize(int width, int height){
 		this.renderResolutionWidth=width;
 		this.renderResolutionHeight=height;
@@ -171,7 +182,14 @@ public abstract class Game {
 	}
 	
 	public void setFullScreen(){
+		frame.dispose();
+		frame = new JFrame(title);
+		frame.setResizable(false);
+		frame.getContentPane().add(canvas);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setUndecorated(true);
+		frame.setVisible(true);
+		setWindowedFrameSize(windowedFrameWidth, windowedFrameHeight);
 		gd.setFullScreenWindow(frame);
 		canvas.setSize(frame.getContentPane().getSize());
 	}
@@ -179,11 +197,11 @@ public abstract class Game {
 	public void setWindowedMode(){
 		frame.dispose();
 		frame = new JFrame(title);
+		frame.setResizable(false);
 		frame.getContentPane().add(canvas);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		setWindowedFrameSize(windowedFrameWidth, windowedFrameHeight);
-		frame.setResizable(false);
 		gd.setFullScreenWindow(null);
 	}
 	

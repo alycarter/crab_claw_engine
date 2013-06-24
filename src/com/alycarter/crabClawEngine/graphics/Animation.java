@@ -25,6 +25,13 @@ public class Animation {
 		this.animationLength=animationLength;
 	}
 	
+	public Animation(Game game, String name,ArrayList<BufferedImage> frames, double animationLength) {
+		this.frames=frames;
+		this.game=game;
+		this.name=name;
+		this.animationLength=animationLength;
+	}
+	
 	public Animation(Game game, String name,TextureTileLoader spriteSheet, int frames,double animationLength) {
 		for(int i=0;i<frames;i++){
 			this.frames.add(spriteSheet.getTile(i));
@@ -71,6 +78,14 @@ public class Animation {
 		if(length>0){
 			animationLength=length;
 		}
+	}
+	
+	public ArrayList<BufferedImage> getAllFrames(){
+		return frames;
+	}
+	
+	public void setFrames (ArrayList<BufferedImage> newFrames){
+		frames=newFrames;
 	}
 
 }
