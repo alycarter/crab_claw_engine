@@ -52,9 +52,10 @@ public class Animation {
 	
 	
 	public void update(){
-		currentFramePointer += (game.getDeltaTime()/animationLength)*frames.size();
+		currentFramePointer +=(game.getDeltaTime()/animationLength)*frames.size();
 		if(currentFramePointer>=frames.size()){
 			reset();
+			onAnimationEnd();
 		}
 	}
 	
@@ -86,6 +87,10 @@ public class Animation {
 	
 	public void setFrames (ArrayList<BufferedImage> newFrames){
 		frames=newFrames;
+	}
+	
+	public void onAnimationEnd(){
+		
 	}
 
 }

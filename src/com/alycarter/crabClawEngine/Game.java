@@ -117,6 +117,8 @@ public abstract class Game {
 		controls.update();
 		if(stateMachine.getCurrentState()!= null){
 			stateMachine.getCurrentState().update();
+		}else{
+			endGame();
 		}
 		onUpdate();
 	}
